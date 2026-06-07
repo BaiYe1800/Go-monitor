@@ -6,6 +6,7 @@ import (
 
 	"github.com/flipped-aurora/gin-vue-admin/server/docs"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/metrics"
 	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
 	"github.com/flipped-aurora/gin-vue-admin/server/router"
 	"github.com/gin-gonic/gin"
@@ -37,6 +38,8 @@ func Routers() *gin.Engine {
 	Router := gin.New()
 	// 使用自定义的 Recovery 中间件，记录 panic 并入库
 	Router.Use(middleware.GinRecovery(true))
+	Router.Use(metrics.Middleware())
+	Router.GET("/metrics", metrics.Handler())
 	if gin.Mode() == gin.DebugMode {
 		Router.Use(gin.Logger())
 	}
