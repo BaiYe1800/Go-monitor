@@ -3,6 +3,7 @@ package initialize
 import (
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/metrics"
 	"gorm.io/gorm"
 )
 
@@ -33,4 +34,10 @@ func DBList() {
 		global.GVA_DB = sysDB
 	}
 	global.GVA_DBList = dbMap
+
+	if global.GVA_DB != nil {
+		if sqlDB, err := global.GVA_DB.DB(); err == nil {
+			metrics.RegisterDBStats(sqlDB)
+		}
+	}
 }
