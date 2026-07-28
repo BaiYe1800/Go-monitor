@@ -1,9 +1,14 @@
 package main
 
 import (
+	"context"
+	"log"
+	"time"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/core"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/initialize"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/telemetry"
 	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
 )
@@ -28,6 +33,18 @@ import (
 // @name                        x-token
 // @BasePath                    /
 func main() {
+	tracerProvider, err := telemetry.InitTracer(context.Background())
+	if err != nil {
+		log.Fatalf("初始化 OpenTelemetry Trace 失败: %v", err)
+	}
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := tracerProvider.Shutdown(ctx); err != nil {
+			log.Printf("关闭 OpenTelemetry Trace 失败: %v", err)
+		}
+	}()
+
 	// 初始化系统
 	initializeSystem()
 	// 运行服务器
