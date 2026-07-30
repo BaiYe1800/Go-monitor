@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"errors"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
@@ -19,14 +20,15 @@ type MenuService struct{}
 
 var MenuServiceApp = new(MenuService)
 
-func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[uint][]system.SysMenu, err error) {
+func (menuService *MenuService) getMenuTreeMap(ctx context.Context, authorityId uint) (treeMap map[uint][]system.SysMenu, err error) {
 	var allMenus []system.SysMenu
 	var baseMenu []system.SysBaseMenu
 	var btns []system.SysAuthorityBtn
 	treeMap = make(map[uint][]system.SysMenu)
+	db := global.GVA_DB.WithContext(ctx)
 
 	var SysAuthorityMenus []system.SysAuthorityMenu
-	err = global.GVA_DB.Where("sys_authority_authority_id = ?", authorityId).Find(&SysAuthorityMenus).Error
+	err = db.Where("sys_authority_authority_id = ?", authorityId).Find(&SysAuthorityMenus).Error
 	if err != nil {
 		return
 	}
@@ -37,7 +39,7 @@ func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[ui
 		MenuIds = append(MenuIds, SysAuthorityMenus[i].MenuId)
 	}
 
-	err = global.GVA_DB.Where("id in (?)", MenuIds).Order("sort").Preload("Parameters").Find(&baseMenu).Error
+	err = db.Where("id in (?)", MenuIds).Order("sort").Preload("Parameters").Find(&baseMenu).Error
 	if err != nil {
 		return
 	}
@@ -51,7 +53,7 @@ func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[ui
 		})
 	}
 
-	err = global.GVA_DB.Where("authority_id = ?", authorityId).Preload("SysBaseMenuBtn").Find(&btns).Error
+	err = db.Where("authority_id = ?", authorityId).Preload("SysBaseMenuBtn").Find(&btns).Error
 	if err != nil {
 		return
 	}
@@ -75,8 +77,8 @@ func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[ui
 //@param: authorityId string
 //@return: menus []system.SysMenu, err error
 
-func (menuService *MenuService) GetMenuTree(authorityId uint) (menus []system.SysMenu, err error) {
-	menuTree, err := menuService.getMenuTreeMap(authorityId)
+func (menuService *MenuService) GetMenuTree(ctx context.Context, authorityId uint) (menus []system.SysMenu, err error) {
+	menuTree, err := menuService.getMenuTreeMap(ctx, authorityId)
 	menus = menuTree[0]
 	for i := 0; i < len(menus); i++ {
 		err = menuService.getChildrenList(&menus[i], menuTree)
