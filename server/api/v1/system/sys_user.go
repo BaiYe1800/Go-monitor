@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/telemetry"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
@@ -488,6 +489,7 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 		response.FailWithMessage("获取失败", c)
 		return
 	}
+	telemetry.WithTrace(c.Request.Context(), global.GVA_LOG).Info("获取用户信息成功")
 	response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
 }
 
