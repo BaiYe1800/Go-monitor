@@ -136,7 +136,7 @@ func (sysParamsApi *SysParamsApi) GetSysParamsList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	list, total, err := sysParamsService.GetSysParamsInfoList(pageInfo)
+	list, total, err := sysParamsService.GetSysParamsInfoList(c.Request.Context(), pageInfo)
 	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败:"+err.Error(), c)

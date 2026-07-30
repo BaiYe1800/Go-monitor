@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/telemetry"
 	"github.com/gookit/color"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
@@ -64,7 +65,10 @@ func (h MysqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 		DSN:                       c.Dsn(), // DSN data source name
 		DefaultStringSize:         191,     // string 类型字段的默认长度
 		SkipInitializeWithVersion: true,    // 根据版本自动配置
-	}), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}); err != nil {
+	}), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		Plugins:                                  telemetry.GormPlugins(),
+	}); err != nil {
 		return ctx, err
 	}
 	global.GVA_CONFIG.AutoCode.Root, _ = filepath.Abs("..")

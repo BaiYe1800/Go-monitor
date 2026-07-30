@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/telemetry"
 	"github.com/gookit/color"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
@@ -68,7 +69,10 @@ func (h PgsqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 	if db, err = gorm.Open(postgres.New(postgres.Config{
 		DSN:                  c.Dsn(), // DSN data source name
 		PreferSimpleProtocol: false,
-	}), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}); err != nil {
+	}), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		Plugins:                                  telemetry.GormPlugins(),
+	}); err != nil {
 		return ctx, err
 	}
 	global.GVA_CONFIG.AutoCode.Root, _ = filepath.Abs("..")

@@ -1,6 +1,8 @@
 package system
 
 import (
+	"context"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
@@ -45,11 +47,11 @@ func (sysParamsService *SysParamsService) GetSysParams(ID string) (sysParams sys
 
 // GetSysParamsInfoList 分页获取参数记录
 // Author [Mr.奇淼](https://github.com/pixelmaxQm)
-func (sysParamsService *SysParamsService) GetSysParamsInfoList(info systemReq.SysParamsSearch) (list []system.SysParams, total int64, err error) {
+func (sysParamsService *SysParamsService) GetSysParamsInfoList(ctx context.Context, info systemReq.SysParamsSearch) (list []system.SysParams, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
-	db := global.GVA_DB.Model(&system.SysParams{})
+	db := global.GVA_DB.WithContext(ctx).Model(&system.SysParams{})
 	var sysParamss []system.SysParams
 	// 如果有条件搜索 下方会自动创建搜索语句
 	if info.StartCreatedAt != nil && info.EndCreatedAt != nil {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/telemetry"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/google/uuid"
@@ -58,7 +59,10 @@ func (h MssqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 
 	var db *gorm.DB
 
-	if db, err = gorm.Open(sqlserver.New(mssqlConfig), &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}); err != nil {
+	if db, err = gorm.Open(sqlserver.New(mssqlConfig), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		Plugins:                                  telemetry.GormPlugins(),
+	}); err != nil {
 		return nil, err
 	}
 

@@ -64,6 +64,7 @@ require (
 	gorm.io/driver/sqlserver v1.5.4
 	gorm.io/gen v0.3.26
 	gorm.io/gorm v1.25.12
+	gorm.io/plugin/opentelemetry v0.1.10
 )
 
 require (

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/telemetry"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -27,5 +28,6 @@ func (g *_gorm) Config(general config.GeneralDB) *gorm.Config {
 			SingularTable: general.Singular,
 		},
 		DisableForeignKeyConstraintWhenMigrating: true,
+		Plugins:                                  telemetry.GormPlugins(),
 	}
 }

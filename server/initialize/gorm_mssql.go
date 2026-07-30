@@ -31,7 +31,7 @@ func GormMssql() *gorm.DB {
 	// 数据库配置
 	general := m.GeneralDB
 	if db, err := gorm.Open(sqlserver.New(mssqlConfig), internal.Gorm.Config(general)); err != nil {
-		return nil
+		panic("初始化 MSSQL 数据库或 OpenTelemetry GORM 插件失败")
 	} else {
 		db.InstanceSet("gorm:table_options", "ENGINE="+m.Engine)
 		sqlDB, _ := db.DB()
