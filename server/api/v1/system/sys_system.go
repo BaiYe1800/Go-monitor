@@ -2,6 +2,7 @@ package system
 
 import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"github.com/flipped-aurora/gin-vue-admin/server/internal/telemetry"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	systemRes "github.com/flipped-aurora/gin-vue-admin/server/model/system/response"
@@ -85,5 +86,6 @@ func (s *SystemApi) GetServerInfo(c *gin.Context) {
 		response.FailWithMessage("获取失败", c)
 		return
 	}
+	telemetry.WithTrace(c.Request.Context(), global.GVA_LOG).Info("获取服务器信息成功")
 	response.OkWithDetailed(gin.H{"server": server}, "获取成功", c)
 }
