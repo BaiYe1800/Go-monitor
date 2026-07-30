@@ -2,10 +2,12 @@ package initialize
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
@@ -25,6 +27,10 @@ func initRedisClient(redisCfg config.Redis) (redis.UniversalClient, error) {
 			Password: redisCfg.Password,
 			DB:       redisCfg.DB,
 		})
+	}
+	if err := redisotel.InstrumentTracing(client, redisotel.WithDBStatement(false)); err != nil {
+		_ = client.Close()
+		return nil, fmt.Errorf("初始化 Redis OpenTelemetry Trace 失败: %w", err)
 	}
 	pong, err := client.Ping(context.Background()).Result()
 	if err != nil {
